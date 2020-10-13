@@ -10,18 +10,30 @@ import Combine
 
 struct Dialogue: View {
     @EnvironmentObject var appData: AppData<Fetcher>
+
+    @State private var inputStream: [Message] = []
     @State private var anyCancellable: AnyCancellable? = nil
-    
+
     var body: some View {
-            NavigationView {
-                VStack(alignment: .leading)
-                {
-                    ForEach(appData.messages) { item in
-                        MessageRow(message: item)
-                    }
-                }.navigationBarTitle(R.dialogueViewTitle, displayMode: .inline)
+        NavigationView {
+            LazyVStack(alignment: .leading, spacing: R.messageStackSpacing)
+            {
+                ForEach(inputStream) { item in
+                    MessageRow(message: item)
+                }
+                .transition(.move(edge: .bottom))
             }
+            .navigationBarTitle(R.dialogueViewTitle, displayMode: .inline)
+            .frame(minWidth: 0, idealWidth: .infinity, maxWidth: .infinity, minHeight: 0, idealHeight: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+            .onAppear() {
+                anyCancellable = messagePublisher().sink(receiveValue: { value in
+                    inputStream.append(value)
+                })
+            }
+            .animation(.linear(duration: R.animationDuration))
+            .padding(R.dialogueViewPadding)
         }
+    }
 }
 
 extension Dialogue {
