@@ -1,0 +1,25 @@
+[
+    {
+        "line": "dialogue line#1",
+        "id": 0,
+        "delivered": false
+    },
+    {
+        "line": "dialogue line#2",
+        "id": 1,
+        "delivered": false
+
+    },
+    {
+        "line": "Tuesday, October the 13th the new iPhone was presented to the general public",
+        "id": 2,
+        "delivered": false
+
+    },
+    {
+        "line": "5G is opening a whole new era of communication",
+        "id": 3,
+        "delivered": false
+
+    },
+]

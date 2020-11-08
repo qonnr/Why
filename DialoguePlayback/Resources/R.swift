@@ -11,6 +11,7 @@ struct R {
     static let background = Color("background")
     static let maxCharacters = 550
     static let animationDuration: Double = 0.5
+    static let preUtteranceDelay: Double = 0.5
     static let dialogueViewPadding: CGFloat = 20.0
     static let messageStackSpacing: CGFloat = 30.0
     static let messageTextPadding: CGFloat = 10.0

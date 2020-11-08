@@ -26,25 +26,13 @@ struct Dialogue: View {
             .navigationBarTitle(R.dialogueViewTitle, displayMode: .inline)
             .frame(minWidth: 0, idealWidth: .infinity, maxWidth: .infinity, minHeight: 0, idealHeight: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
             .onAppear() {
-                anyCancellable = messagePublisher().sink(receiveValue: { value in
+                anyCancellable = appData.messagePublisher().sink(receiveValue: { value in
                     inputStream.append(value)
                 })
             }
             .animation(.linear(duration: R.animationDuration))
             .padding(R.dialogueViewPadding)
         }
-    }
-}
-
-extension Dialogue {
-    func messagePublisher() -> AnyPublisher<Message, Never> {
-        let publishers = appData.messages
-            .map { Just($0).delay(for: .seconds(1),
-                                  scheduler: DispatchQueue.main).eraseToAnyPublisher() }
-        return publishers[1...]
-            .reduce(publishers[0]) {
-                Publishers.Concatenate(prefix: $0, suffix: $1).eraseToAnyPublisher()
-            }
     }
 }
 
