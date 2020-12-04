@@ -16,22 +16,23 @@ struct Dialogue: View {
 
     var body: some View {
         NavigationView {
-            LazyVStack(alignment: .leading, spacing: R.messageStackSpacing)
+            LazyVStack
             {
-                ForEach(inputStream) { item in
-                    MessageRow(message: item)
-                }
-                .transition(.move(edge: .bottom))
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: R.messageStackSpacing) {
+                        ForEach(inputStream) { item in
+                            MessageRow(message: item)
+                        }
+                    }.padding(R.balloon.radius)
+                }.animation(.linear(duration: R.animationDuration))
             }
             .navigationBarTitle(R.dialogueViewTitle, displayMode: .inline)
-            .frame(minWidth: 0, idealWidth: .infinity, maxWidth: .infinity, minHeight: 0, idealHeight: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+            .frame(minWidth: 0, idealWidth: .infinity, maxWidth: .infinity, minHeight: 0, idealHeight: .infinity, maxHeight: .infinity, alignment: .bottom)    
             .onAppear() {
-                anyCancellable = appData.messagePublisher().sink(receiveValue: { value in
+                anyCancellable = appData.messagePublisher()?.sink(receiveValue: { value in
                     inputStream.append(value)
                 })
-            }
-            .animation(.linear(duration: R.animationDuration))
-            .padding(R.dialogueViewPadding)
+            }.padding(R.dialogueViewPadding)
         }
     }
 }

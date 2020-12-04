@@ -22,14 +22,13 @@ class AppData<T: Loader>: ObservableObject {
 }
 
 extension AppData {
-    func messagePublisher() -> AnyPublisher<Message, Never> {
+    func messagePublisher() -> AnyPublisher<Message, Never>? {
         let publishers = messages
-            .map { Just($0).delay(for: .seconds(1),
-                                  scheduler: DispatchQueue.main).eraseToAnyPublisher() }
-        return publishers[1...]
-            .reduce(publishers[0]) {
-                Publishers.Concatenate(prefix: $0, suffix: $1).eraseToAnyPublisher()
-            }
+            .map { Just($0).delay(for: .seconds(1.0), scheduler: DispatchQueue.main).eraseToAnyPublisher() }
+        
+        return publishers.first.map { publishers.dropFirst().reduce($0) {
+            $0.append($1).eraseToAnyPublisher()
+        } }
     }
 }
 
