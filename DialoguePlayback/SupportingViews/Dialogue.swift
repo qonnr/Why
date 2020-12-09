@@ -26,7 +26,7 @@ struct Dialogue: View {
             LazyVStack
             {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: R.messageStackSpacing) {
+                    LazyVStack(alignment: .leading) {
                         ForEach(feed) { item in
                             MessageRow(message:
                                         item)
@@ -34,6 +34,7 @@ struct Dialogue: View {
                                 .onCompleteAnimation(for: item.opacity) {
                                     deliveredPub.send()
                                 }
+                                .padding(EdgeInsets(top: R.messageStackSpacing / 2, leading: R.messageLeadingPadding, bottom: R.messageStackSpacing / 2, trailing: R.messageLeadingPadding))
                                 .onAppear {
                                     withAnimation(.linear(duration: R.animationDuration)) {
                                         feed.firstIndex { $0.id == item.id }
@@ -41,8 +42,9 @@ struct Dialogue: View {
                                     }
                                 }
                         }
-                    }.padding(R.balloon.radius)
-                }.animation(.linear(duration: R.animationDuration))
+                    }
+                }
+                .animation(.linear(duration: R.animationDuration))
             }
             .navigationBarTitle(R.dialogueViewTitle, displayMode: .inline)
             .frame(minWidth: 0, idealWidth: .infinity, maxWidth: .infinity,
@@ -66,7 +68,7 @@ struct Dialogue: View {
                 // To kick-off
                 deliveredPub.send()
                 ///
-            }.padding(R.dialogueViewPadding)
+            }
         }
     }
 }
