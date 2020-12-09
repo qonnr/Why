@@ -19,8 +19,10 @@ struct BalloonShape: Shape {
             let startPoint = CGPoint(x: R.tail.dx,
                                      y: rect.maxY - R.tail.dy)
             tail.move(to: startPoint)
-            tail.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
             tail.addLine(to: CGPoint(x: R.tail.dx, y: rect.maxY))
+            tail.addLine(to: CGPoint(x: R.tail.d, y: rect.maxY))
+            tail.addArc(center: CGPoint(x: R.tail.d, y: rect.maxY - R.tail.r), radius: R.tail.r, startAngle: Angle(radians: Double.pi / 2), endAngle: Angle(radians: Double.pi / 2 + Double(R.tail.rotation)), clockwise: false)
+            
             path.addPath(tail)
         }
     }
@@ -37,6 +39,5 @@ struct MessageBackground_Previews: PreviewProvider {
             .padding()
             .background(Color.green)
             .clipShape(BalloonShape())
-            
     }
 }

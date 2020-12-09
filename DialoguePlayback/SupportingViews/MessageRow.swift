@@ -25,7 +25,7 @@ struct MessageRow: View {
 struct DialogueItem_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            MessageRow(message: AppData<Fetcher>().messages[2])
+            MessageRow(message: .init(text: "Hellow SwiftUI World!"))
         }
     }
 }

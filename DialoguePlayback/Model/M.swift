@@ -12,36 +12,25 @@ protocol Loader {
     static func load() -> [Message]
 }
 
-struct Message: Identifiable {
+struct Message: Identifiable, Hashable {
     var id = UUID()
     var text: String
+    var opacity = 0.0
 }
 
 class AppData<T: Loader>: ObservableObject {
-    @Published var messages: [Message] = T.load()
+    ///
+    private var messages: [Message] = T.load()
+    ///
 }
 
 extension AppData {
-    func messagePublisher() -> AnyPublisher<Message, Never>? {
-        let publishers = messages
-            .map { Just($0).delay(for: .seconds(1.0), scheduler: DispatchQueue.main).eraseToAnyPublisher() }
-        
+    func messagePub() -> AnyPublisher<Message, Never>? {
+        let publishers = messages.map { message in
+            Just(message).eraseToAnyPublisher()
+        }
         return publishers.first.map { publishers.dropFirst().reduce($0) {
             $0.append($1).eraseToAnyPublisher()
         } }
-    }
-}
-
-class Player: NSObject, AVSpeechSynthesizerDelegate {
-    private func playback(_ text: String) {
-        let speaker = AVSpeechSynthesizer()
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-        utterance.preUtteranceDelay = R.preUtteranceDelay
-        speaker.speak(utterance)
-    }
-
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        
     }
 }

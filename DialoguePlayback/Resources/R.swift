@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct R {
-    static let dialogueViewTitle = "Dialogue"
+    static let dialogueViewTitle = "'Good Leaders Eat Last'"
     static let background = Color("background")
     static let maxCharacters = 550
     static let animationDuration: Double = 0.5
@@ -26,8 +26,13 @@ extension R {
     struct tail {
         static let dx: CGFloat = 11.0
         static let dy: CGFloat = 18.0
+        static let c: CGFloat = hypot(dx, dy)
+        static let r: CGFloat = (dx + dy - c) / 2
+        static let d: CGFloat = (c + dx - dy) / 2
         static let startY: CGFloat = (dy / dx) * startX
         static let startX: CGFloat = 2
+        static let alpha: CGFloat = atan2(dy, dx)
+        static let rotation: CGFloat = CGFloat.pi - alpha        
     }
     
     struct shadow {
