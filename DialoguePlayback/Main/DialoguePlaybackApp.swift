@@ -13,6 +13,7 @@ struct DialoguePlaybackApp: App {
     var body: some Scene {
         WindowGroup {
             Dialogue()
+                .environment(\.colorScheme, .light)
                 .environmentObject(appData)
         }
     }

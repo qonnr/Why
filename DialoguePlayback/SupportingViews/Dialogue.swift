@@ -7,14 +7,12 @@
 
 import SwiftUI
 import Combine
-import AVKit
 
 struct Dialogue: View {
     @EnvironmentObject var appData: AppData<Fetcher>
-    
-    @State private var utterance: AVSpeechUtterance?
+    ///
     @State private var feed: [Message] = []
-    
+    ///
     @State private var storage = Set<AnyCancellable>()
     ///
     private let deliveredPub = PassthroughSubject<Void, Never>()
@@ -58,12 +56,12 @@ struct Dialogue: View {
                     .zip(player.$isPlaying).compactMap { $0.1 == false ? $0.0 : nil }
                     .sink {
                         feed.append($0)
-                        utterance = AVSpeechUtterance(string: String($0.text.prefix(R.maxCharacters))) }
+                        player.push(String($0.text.prefix(R.maxCharacters))) }
                     .store(in: &storage)
                 ///
                 deliveredPub
                     .delay(for: .seconds(R.preUtteranceDelay), scheduler: RunLoop.main)
-                    .sink { utterance.map { player.speaker.speak($0) } }
+                    .sink { player.pop() }
                     .store(in: &storage)
                 // To kick-off
                 deliveredPub.send()
