@@ -10,34 +10,64 @@ import SwiftUI
 struct BalloonShape: Shape {
     func path(in rect: CGRect) -> Path {
         Path { path in
-            let dxRect = rect.insetBy(dx: R.tail.dx, dy: 0)
-            let body = UIBezierPath(roundedRect: dxRect,
-                                    byRoundingCorners: bodyCorners,
-                                    cornerRadii: bodyRadii)
-            path.addPath(Path(body.cgPath))
-            var tail = Path()
-            let startPoint = CGPoint(x: R.tail.dx,
-                                     y: rect.maxY - R.tail.dy)
-            tail.move(to: startPoint)
-            tail.addLine(to: CGPoint(x: R.tail.dx, y: rect.maxY))
-            tail.addLine(to: CGPoint(x: R.tail.d, y: rect.maxY))
-            tail.addArc(center: CGPoint(x: R.tail.d, y: rect.maxY - R.tail.r), radius: R.tail.r, startAngle: Angle(radians: Double.pi / 2), endAngle: Angle(radians: Double.pi / 2 + Double(R.tail.rotation)), clockwise: false)
+            let tailIncentr = CGPoint(x: R.Tail.d, y: rect.maxY - R.Radius.tail)
+            let bodyRadius: CGFloat = R.Radius.balloonBody
+            let start = CGPoint(x: R.Tail.d, y: rect.maxY )
             
-            path.addPath(tail)
+            var p = Path()
+            
+            p.move(to: start)
+            p.addRelativeArc(
+                center: tailIncentr,
+                radius: R.Radius.tail,
+                startAngle: Angle(radians: .pi/2),
+                delta: Angle(radians: Double(R.Tail.rotation)))
+            
+            p.addLine(to: CGPoint(x: R.Tail.dx, y: rect.maxY - R.Tail.dy))
+            p.addLine(to: CGPoint(x: R.Tail.dx, y: rect.minY + bodyRadius))
+            
+            var c = CGPoint(x: R.Tail.dx + bodyRadius, y: rect.minY + bodyRadius)
+            p.addRelativeArc(
+                center: c,
+                radius: bodyRadius,
+                startAngle: Angle(radians: .pi),
+                delta: Angle(radians: .pi/2))
+            
+            p.addLine(to: CGPoint(x: rect.maxX - bodyRadius, y: rect.minY))
+            
+            c = CGPoint(x: rect.maxX - bodyRadius, y: rect.minY + bodyRadius)
+            p.addRelativeArc(
+                center: c,
+                radius: bodyRadius,
+                startAngle: Angle(radians: .pi*3/2),
+                delta: Angle(radians: .pi/2))
+            
+            p.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - bodyRadius))
+            
+            c = CGPoint(x: rect.maxX - bodyRadius, y: rect.maxY - bodyRadius)
+            p.addRelativeArc(
+                center: c,
+                radius: bodyRadius,
+                startAngle: Angle(radians: 0),
+                delta: Angle(radians: .pi/2))
+            
+            path.addPath(p)
+            path.closeSubpath()
         }
     }
 }
 
-extension BalloonShape {
-    var bodyRadii: CGSize { CGSize(width: R.balloon.radius, height: R.balloon.radius) }
-    var bodyCorners: UIRectCorner { [.topLeft, .topRight, .bottomRight] }
-}
-
 struct MessageBackground_Previews: PreviewProvider {
     static var previews: some View {
-        Text("Hello World!")
-            .padding()
-            .background(Color.green)
-            .clipShape(BalloonShape())
+        Group {
+            Text("Hello World!")
+                .padding()
+                .background(Color.green)
+                .clipShape(BalloonShape())
+            
+            BalloonShape()
+                .stroke(/*@START_MENU_TOKEN@*/Color.blue/*@END_MENU_TOKEN@*/)
+                .frame(width: 200, height: 60, alignment: .center)
+        }
     }
 }

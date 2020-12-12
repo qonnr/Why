@@ -21,51 +21,53 @@ struct Dialogue: View {
     ///
     var body: some View {
         NavigationView {
-            LazyVStack
-            {
-                ScrollView {
-                    LazyVStack(alignment: .leading) {
-                        ForEach(feed) { item in
-                            MessageRow(message:
-                                        item)
-                                .opacity(item.opacity)
-                                .onCompleteAnimation(for: item.opacity) {
-                                    deliveredPub.send()
-                                }
-                                .padding(EdgeInsets(top: R.messageStackSpacing / 2, leading: R.messageLeadingPadding, bottom: R.messageStackSpacing / 2, trailing: R.messageLeadingPadding))
-                                .onAppear {
-                                    withAnimation(.linear(duration: R.animationDuration)) {
-                                        feed.firstIndex { $0.id == item.id }
-                                            .map { feed[$0].opacity = 1.0 }
+            ZStack {
+                R.Color.background
+                LazyVStack {
+                    ScrollView {
+                        LazyVStack(alignment: .leading) {
+                            ForEach(feed) { item in
+                                MessageRow(message:
+                                            item)
+                                    .opacity(item.opacity)
+                                    .onCompleteAnimation(for: item.opacity) {
+                                        deliveredPub.send()
                                     }
-                                }
+                                    .padding(R.Insets.balloon)
+                                    .onAppear {
+                                        withAnimation(.linear(duration: R.Seconds.animation)) {
+                                            feed.firstIndex { $0.id == item.id }
+                                                .map { feed[$0].opacity = 1.0 }
+                                        }
+                                    }
+                            }
                         }
                     }
+                    .animation(.linear(duration: R.Seconds.animation))
                 }
-                .animation(.linear(duration: R.animationDuration))
-            }
-            .navigationBarTitle(R.dialogueViewTitle, displayMode: .inline)
-            .frame(minWidth: 0, idealWidth: .infinity, maxWidth: .infinity,
-                   minHeight: 0, idealHeight: .infinity, maxHeight: .infinity,
-                   alignment: .bottom)
-            .onAppear() {
-                ///
-                appData.messagePub()?
-                    .zip(deliveredPub).map { $0.0 }
-                    .delay(for: .seconds(R.preUtteranceDelay), scheduler: DispatchQueue.main)
-                    .zip(player.$isPlaying).compactMap { $0.1 == false ? $0.0 : nil }
-                    .sink {
-                        feed.append($0)
-                        player.push(String($0.text.prefix(R.maxCharacters))) }
-                    .store(in: &storage)
-                ///
-                deliveredPub
-                    .delay(for: .seconds(R.preUtteranceDelay), scheduler: RunLoop.main)
-                    .sink { player.pop() }
-                    .store(in: &storage)
-                // To kick-off
-                deliveredPub.send()
-                ///
+                .navigationBarTitle(R.dialogueViewTitle, displayMode: .inline)
+                .frame(minWidth: 0, idealWidth: .infinity, maxWidth: .infinity,
+                       minHeight: 0, idealHeight: .infinity, maxHeight: .infinity,
+                       alignment: .bottom)
+                .onAppear() {
+                    ///
+                    appData.messagePub()?
+                        .zip(deliveredPub).map { $0.0 }
+                        .delay(for: .seconds(R.Seconds.preUtterance), scheduler: DispatchQueue.main)
+                        .zip(player.$isPlaying).compactMap { $0.1 == false ? $0.0 : nil }
+                        .sink {
+                            feed.append($0)
+                            player.push(String($0.text.prefix(R.maxCharacters))) }
+                        .store(in: &storage)
+                    ///
+                    deliveredPub
+                        .delay(for: .seconds(R.Seconds.preUtterance), scheduler: RunLoop.main)
+                        .sink { player.pop() }
+                        .store(in: &storage)
+                    // To kick-off
+                    deliveredPub.send()
+                    ///
+                }
             }
         }
     }

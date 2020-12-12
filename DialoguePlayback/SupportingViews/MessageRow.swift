@@ -11,14 +11,14 @@ struct MessageRow: View {
     var message: Message
     var body: some View {
         Text(message.text.prefix(R.maxCharacters))
-            .font(.system(size: R.font.size))
-            .padding(EdgeInsets(top: R.messageTextPadding, leading: R.messageTextPadding + R.tail.dx, bottom: R.messageTextPadding, trailing: R.messageTextPadding + R.tail.dx))
-            .background(R.balloon.color)
+            .font(.system(size: R.Font.size))
+            .padding(R.Insets.message)
+            .background(R.Color.balloon)
             .clipShape(BalloonShape())
-            .shadow(color: R.shadow.color,
-                    radius: R.shadow.radius,
-                    x: R.shadow.x,
-                    y: R.shadow.y)
+            .shadow(color: R.Color.shadow,
+                    radius: R.Radius.messageShadow,
+                    x: R.Shadow.x,
+                    y: R.Shadow.y)
     }
 }
 
