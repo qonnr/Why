@@ -45,7 +45,7 @@ struct Dialogue: View {
                     }
                     .animation(.linear(duration: R.Seconds.animation))
                 }
-                .navigationBarTitle(R.dialogueViewTitle, displayMode: .inline)
+                .navigationBarTitle(R.Strings.title, displayMode: .inline)
                 .frame(minWidth: 0, idealWidth: .infinity, maxWidth: .infinity,
                        minHeight: 0, idealHeight: .infinity, maxHeight: .infinity,
                        alignment: .bottom)

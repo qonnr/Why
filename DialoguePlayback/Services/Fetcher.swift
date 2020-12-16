@@ -33,7 +33,7 @@ struct S {
 
 struct Fetcher: Loader {
     static func load() -> [Message] {
-        let scenario: [DialogueScenario] = S.load("startWithWhy.json")
+        let scenario: [DialogueScenario] = S.load("testRealQuick.json")
         return scenario.map { Message(text: $0.line) }
     }
 }
