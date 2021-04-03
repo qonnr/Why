@@ -4,21 +4,12 @@
 //
 //  Created by Alexander Kutsan on 25.09.2020.
 //
-
 import SwiftUI
 import Combine
 
 struct Dialogue: View {
-    @EnvironmentObject var appData: AppData<Fetcher>
-    ///
-    @State private var feed: [Message] = []
-    ///
-    @State private var storage = Set<AnyCancellable>()
-    ///
-    private let deliveredPub = PassthroughSubject<Void, Never>()
-    ///
-    private let player = Player()
-    ///
+    @StateObject var msg = MsgStore()
+    /// ###
     var body: some View {
         NavigationView {
             ZStack {
@@ -26,18 +17,18 @@ struct Dialogue: View {
                 LazyVStack {
                     ScrollView {
                         LazyVStack(alignment: .leading) {
-                            ForEach(feed) { item in
+                            ForEach(msg.feed) { item in
                                 MessageRow(message:
                                             item)
                                     .opacity(item.opacity)
                                     .onCompleteAnimation(for: item.opacity) {
-                                        deliveredPub.send()
+                                        msg.delivered.send()
                                     }
                                     .padding(R.Insets.balloon)
                                     .onAppear {
                                         withAnimation(.linear(duration: R.Seconds.animation)) {
-                                            feed.firstIndex { $0.id == item.id }
-                                                .map { feed[$0].opacity = 1.0 }
+                                            msg.feed.firstIndex { $0.id == item.id }
+                                                .map { msg.feed[$0].opacity = 1.0 }
                                         }
                                     }
                             }
@@ -49,33 +40,14 @@ struct Dialogue: View {
                 .frame(minWidth: 0, idealWidth: .infinity, maxWidth: .infinity,
                        minHeight: 0, idealHeight: .infinity, maxHeight: .infinity,
                        alignment: .bottom)
-                .onAppear() {
-                    ///
-                    appData.messagePub()?
-                        .zip(deliveredPub).map { $0.0 }
-                        .delay(for: .seconds(R.Seconds.preUtterance), scheduler: DispatchQueue.main)
-                        .zip(player.$isPlaying).compactMap { $0.1 == false ? $0.0 : nil }
-                        .sink {
-                            feed.append($0)
-                            player.push(String($0.text.prefix(R.maxCharacters))) }
-                        .store(in: &storage)
-                    ///
-                    deliveredPub
-                        .delay(for: .seconds(R.Seconds.preUtterance), scheduler: RunLoop.main)
-                        .sink { player.pop() }
-                        .store(in: &storage)
-                    // To kick-off
-                    deliveredPub.send()
-                    ///
-                }
             }
         }
     }
 }
-
+/// ###
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        Dialogue().environmentObject(AppData<Fetcher>())
+        Dialogue()
     }
 }
 // MARK: - Animation

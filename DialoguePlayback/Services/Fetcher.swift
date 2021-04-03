@@ -31,11 +31,7 @@ struct S {
     }
 }
 
-struct Fetcher: Loader {
-    static func load() -> [Message] {
-        let scenario: [DialogueScenario] = S.load("testRealQuick.json")
-        return scenario.map { Message(text: $0.line) }
-    }
+struct Fetcher {
 }
 
 private extension Fetcher {
@@ -43,3 +39,23 @@ private extension Fetcher {
         let line: String
     }
 }
+
+extension Fetcher {
+    struct Basic: Loader {
+        static func load() -> [Message] {
+            let scenario: [DialogueScenario] = S.load("testRealQuick.json")
+            return scenario.map { Message(text: $0.line) }
+        }
+    }
+}
+
+extension Fetcher {
+    struct Full: Loader {
+        static func load() -> [Message] {
+            let scenario: [DialogueScenario] = S.load("startWithWhy.json")
+            return scenario.map { Message(text: $0.line) }
+        }
+    }
+}
+
+
