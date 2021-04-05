@@ -15,16 +15,15 @@ protocol Loader {
 struct Message: Identifiable, Hashable {
     var id = UUID()
     var text: String
-    var opacity = 0.0
 }
 /// ### App's data essentials
 class MsgStore: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
     /// ###
     @Published public var feed: [Message] = []
     /// ###
-    public let delivered = PassthroughSubject<Void, Never>()
+    public var delivered = PassthroughSubject<Void, Never>()
     /// ###
-    private var cache: [Message] = Fetcher.Basic.load()
+    private var cache: [Message] = Fetcher.Full.load()
     /// ###
     private var bag = Set<AnyCancellable>()
     /// ###
