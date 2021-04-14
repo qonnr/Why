@@ -12,16 +12,16 @@ protocol Loader {
     static func load() -> [Message]
 }
 /// ### Model
-struct Message: Identifiable, Hashable {
+struct Message: Identifiable {
     var id = UUID()
     var text: String
 }
 /// ### App's data essentials
 class MsgStore: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
     /// ###
-    @Published public var feed: [Message] = []
+    @Published public private(set) var feed: [Message] = []
     /// ###
-    public var delivered = PassthroughSubject<Void, Never>()
+    public private(set) var delivered = PassthroughSubject<Void, Never>()
     /// ###
     private var cache: [Message] = Fetcher.Full.load()
     /// ###
@@ -30,8 +30,12 @@ class MsgStore: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
     override init() {
         super.init()
         
-        let pubs = cache.map { Just($0).eraseToAnyPublisher() }
-        let temp = pubs.first.map { pubs.dropFirst().reduce($0) { $0.append($1).eraseToAnyPublisher() } }
+        let pubs = cache
+            .map { Just($0).eraseToAnyPublisher() }
+        let temp = pubs
+            .first
+            .map { pubs.dropFirst().reduce($0) { $0.append($1).eraseToAnyPublisher() } }
+        
         guard let values = temp else { return }
         
         values

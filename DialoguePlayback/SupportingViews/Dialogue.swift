@@ -8,26 +8,28 @@ import SwiftUI
 import Combine
 
 struct Dialogue: View {
-    @StateObject var msg = MsgStore()
     /// ###
     var body: some View {
         NavigationView {
             ZStack {
                 R.Color.background
-                MsgList(msg: msg)
+                MsgList()
             }
         }
     }
 }
 /// ###
 struct MsgList: View {
-    @ObservedObject var msg: MsgStore
+    @StateObject var msg = MsgStore()
+    /// ###
     var body: some View {
         LazyVStack {
             ScrollView {
                 LazyVStack(alignment: .leading) {
                     ForEach(msg.feed) { item in
-                        MessageRow(message: item, delivered: $msg.delivered).padding(R.Insets.balloon)
+                        MessageRow(message: item)
+                            .padding(R.Insets.balloon)
+                            .environmentObject(msg)
                     }
                 }
             }

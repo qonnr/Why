@@ -9,8 +9,9 @@ import SwiftUI
 import Combine
 
 struct MessageRow: View {
+    @EnvironmentObject var store: MsgStore
+    /// ###
     var message: Message
-    @Binding var delivered: PassthroughSubject<Void, Never>
     /// ###
     @State private var opacityValue = 0.0
     var body: some View {
@@ -27,15 +28,15 @@ struct MessageRow: View {
             .onAppear() {
                 opacityValue = 1.0
             }
-            .onCompleteAnimation(for: opacityValue) { delivered.send() }        
+            .onCompleteAnimation(for: opacityValue) {
+                store.delivered.send() }
     }
 }
 
 struct DialogueItem_Previews: PreviewProvider {
-    @State static var mockSubj = PassthroughSubject<Void, Never>()
     static var previews: some View {
         Group {
-            MessageRow(message: .init(text: "Hellow SwiftUI World!"), delivered: $mockSubj)
+            MessageRow(message: .init(text: "Hellow SwiftUI World!"))
         }
     }
 }
