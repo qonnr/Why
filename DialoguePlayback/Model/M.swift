@@ -17,11 +17,11 @@ struct Message: Identifiable {
     var text: String
 }
 /// ### App's data essentials
-class MsgStore: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
+final class MsgStore: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
     /// ###
     @Published public private(set) var feed: [Message] = []
     /// ###
-    public private(set) var delivered = PassthroughSubject<Void, Never>()
+    public private(set) var bookmark = PassthroughSubject<Void, Never>()
     /// ###
     private var cache: [Message] = Fetcher.Full.load()
     /// ###
@@ -29,30 +29,30 @@ class MsgStore: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
     /// ###
     override init() {
         super.init()
-        
-        let pubs = cache
-            .map { Just($0).eraseToAnyPublisher() }
-        let temp = pubs
-            .first
-            .map { pubs.dropFirst().reduce($0) { $0.append($1).eraseToAnyPublisher() } }
-        
+        /// ###
+        let pubs = cache.lazy.map { Just($0).eraseToAnyPublisher() }
+        let temp = pubs.first.map {
+            pubs.dropFirst().reduce($0) { $0.append($1).eraseToAnyPublisher() }
+        }
         guard let values = temp else { return }
-        
+        /// ###
         values
-            .zip(delivered).map(\.0)
+            .zip(bookmark)
+            .map(\.0)
+            .zip($isPlaying)
+            .map(\.0)
             .delay(for: .seconds(R.Seconds.preUtterance), scheduler: DispatchQueue.main)
-            .zip($isPlaying).compactMap { $0.1 == false ? $0.0 : nil }
             .sink { [self] in
                 feed.append($0)
-                utterance = AVSpeechUtterance(string:  String($0.text.prefix(R.maxCharacters))) }
+                utterance = AVSpeechUtterance(string:  String($0.text.prefix(R.maxCharacters)))
+            }
             .store(in: &bag)
-        
-        delivered
-            .delay(for: .seconds(R.Seconds.preUtterance), scheduler: RunLoop.main)
+        /// ###
+        bookmark
+            .dropFirst()
+            .delay(for: .seconds(R.Seconds.preUtterance), scheduler: DispatchQueue.main)
             .sink { [self] in utterance.map { speaker.speak($0) } }
             .store(in: &bag)
-        // To kick-off
-        delivered.send()
     }
     /// ### AVKit
     @Published private var isPlaying = false

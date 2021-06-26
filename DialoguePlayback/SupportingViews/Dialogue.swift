@@ -39,6 +39,10 @@ struct MsgList: View {
         .frame(minWidth: 0, idealWidth: .infinity, maxWidth: .infinity,
                minHeight: 0, idealHeight: .infinity, maxHeight: .infinity,
                alignment: .bottom)
+        .onAppear {
+            /// ### To kick-off
+            msg.bookmark.send()
+        }
     }
 }
 /// ###

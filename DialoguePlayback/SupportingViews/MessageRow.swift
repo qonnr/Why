@@ -29,7 +29,7 @@ struct MessageRow: View {
                 opacityValue = 1.0
             }
             .onCompleteAnimation(for: opacityValue) {
-                store.delivered.send() }
+                store.bookmark.send() }
     }
 }
 
